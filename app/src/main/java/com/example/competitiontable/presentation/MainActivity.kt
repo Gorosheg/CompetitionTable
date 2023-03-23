@@ -11,6 +11,7 @@ import com.example.competitiontable.databinding.ActivityMainBinding
 import com.example.competitiontable.presentation.model.CompetitionTableState
 import com.example.competitiontable.presentation.recycler.base.CommonAdapter
 import com.example.competitiontable.presentation.recycler.scoreTableDelegate
+import com.example.competitiontable.presentation.recycler.scoreTableMiddleCellDelegate
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -21,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: CompetitionTableViewModel by viewModel()
 
     private val scoreTableAdapter = CommonAdapter(
+        scoreTableMiddleCellDelegate(),
         scoreTableDelegate { id, text ->
             viewModel.onSellTextChanged(id, text)
         }

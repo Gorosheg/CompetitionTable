@@ -1,12 +1,12 @@
 package com.example.competitiontable.presentation
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.competitiontable.presentation.model.CompetitionTableState
+import com.example.competitiontable.presentation.model.ScoreMiddleItem
 import com.example.competitiontable.presentation.model.ScoreSellItem
+import com.example.competitiontable.presentation.model.TableListItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 class CompetitionTableViewModel : ViewModel() {
 
@@ -19,27 +19,31 @@ class CompetitionTableViewModel : ViewModel() {
     fun onSellTextChanged(id: Int, newScore: String) {
         when (newScore) {
             "0", "1", "2", "3", "4", "5" -> {
-                val newTable = buildNewTable(id, newScore, true)
+                val newTable = buildNewTable(id = id, newScore = newScore, isScoreCorrect = true)
                 setNewSellScore(id, newScore, newTable)
             }
             "" -> Unit
             else -> {
-                val newTable = buildNewTable(id, newScore, false)
+                val newTable = buildNewTable(id = id, newScore = newScore, isScoreCorrect = false)
                 state.update { CompetitionTableState(scoreSellItems = newTable, isScoreCorrect = false) }
             }
         }
 
     }
 
-    private fun buildNewTable(id: Int, newScore: String, isScoreCorrect: Boolean): MutableList<ScoreSellItem> {
+    private fun buildNewTable(id: Int, newScore: String, isScoreCorrect: Boolean): MutableList<TableListItem> {
         val newTable = state.value.scoreSellItems.toMutableList()
-        newTable[id] = ScoreSellItem(id, newScore, isScoreCorrect)
+        newTable[id] = ScoreSellItem(
+            id = id,
+            score = newScore,
+            isScoreCorrect = isScoreCorrect
+        )
         return newTable
     }
 
-    private fun setNewSellScore(id: Int, newScore: String, newTable: MutableList<ScoreSellItem>) {
+    private fun setNewSellScore(id: Int, newScore: String, newTable: MutableList<TableListItem>) {
         val sameScoredId = getSameScoredId(id, newTable.size)
-        newTable[sameScoredId] = ScoreSellItem(sameScoredId, newScore)
+        newTable[sameScoredId] = ScoreSellItem(id = sameScoredId, score = newScore)
 
         state.update { CompetitionTableState(scoreSellItems = newTable, isScoreCorrect = true) }
     }
@@ -56,19 +60,24 @@ class CompetitionTableViewModel : ViewModel() {
     }
 
     private fun setState() {
-        viewModelScope.launch {
-            state.update {
-                CompetitionTableState(
-                    scoreSellItems = getInitScoreSells()
-                )
-            }
+        state.update {
+            CompetitionTableState(
+                scoreSellItems = getInitScoreSells()
+            )
         }
     }
 
-    private fun getInitScoreSells(): List<ScoreSellItem> {
-        val list = mutableListOf<ScoreSellItem>()
+    private fun getInitScoreSells(): List<TableListItem> {
+        val list = mutableListOf<TableListItem>()
+
         for (i in 0 until TABLE_LENGTH * TABLE_LENGTH) {
-            list.add(ScoreSellItem(id = i, score = ""))
+            if (i % (TABLE_LENGTH + 1) == 0) {
+                list.add(ScoreMiddleItem)
+            } else {
+                list.add(
+                    ScoreSellItem(id = i, score = "")
+                )
+            }
         }
         return list
     }
