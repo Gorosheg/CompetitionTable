@@ -1,6 +1,7 @@
 package com.example.competitiontable.presentation
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -19,8 +20,10 @@ class MainActivity : AppCompatActivity() {
     private val binding: ActivityMainBinding by viewBinding()
     private val viewModel: CompetitionTableViewModel by viewModel()
 
-    private val scorecheetAdapter = CommonAdapter(
-        scoreTableDelegate()
+    private val scoreTableAdapter = CommonAdapter(
+        scoreTableDelegate { id, text ->
+            viewModel.onSellTextChanged(id, text)
+        }
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,13 +31,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         binding.scoreRecycler.layoutManager = GridLayoutManager(this, 7)
-        binding.scoreRecycler.adapter = scorecheetAdapter
+        binding.scoreRecycler.adapter = scoreTableAdapter
 
         viewModel.state.onEach { state -> renderState(state) }.launchIn(lifecycleScope)
     }
 
     private fun renderState(state: CompetitionTableState) = with(binding) {
-        scorecheetAdapter.items = state.scoreSellItems
-        scorecheetAdapter.notifyDataSetChanged()
+        scoreTableAdapter.items = state.scoreSellItems
+
+        if (!scoreRecycler.isComputingLayout) {
+            scoreTableAdapter.notifyDataSetChanged()
+        }
+
+        if (!state.isScoreCorrect) {
+            Toast.makeText(this@MainActivity, getString(R.string.toast_messaage), Toast.LENGTH_SHORT).show()
+        }
     }
 }

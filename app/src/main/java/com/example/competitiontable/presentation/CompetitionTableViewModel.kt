@@ -16,6 +16,45 @@ class CompetitionTableViewModel : ViewModel() {
         setState()
     }
 
+    fun onSellTextChanged(id: Int, newScore: String) {
+        when (newScore) {
+            "0", "1", "2", "3", "4", "5" -> {
+                val newTable = buildNewTable(id, newScore, true)
+                setNewSellScore(id, newScore, newTable)
+            }
+            "" -> Unit
+            else -> {
+                val newTable = buildNewTable(id, newScore, false)
+                state.update { CompetitionTableState(scoreSellItems = newTable, isScoreCorrect = false) }
+            }
+        }
+
+    }
+
+    private fun buildNewTable(id: Int, newScore: String, isScoreCorrect: Boolean): MutableList<ScoreSellItem> {
+        val newTable = state.value.scoreSellItems.toMutableList()
+        newTable[id] = ScoreSellItem(id, newScore, isScoreCorrect)
+        return newTable
+    }
+
+    private fun setNewSellScore(id: Int, newScore: String, newTable: MutableList<ScoreSellItem>) {
+        val sameScoredId = getSameScoredId(id, newTable.size)
+        newTable[sameScoredId] = ScoreSellItem(sameScoredId, newScore)
+
+        state.update { CompetitionTableState(scoreSellItems = newTable, isScoreCorrect = true) }
+    }
+
+    private fun getSameScoredId(id: Int, tableSize: Int): Int {
+        for (sameScoreId in 0..tableSize) {
+            if (sameScoreId % TABLE_LENGTH == id / TABLE_LENGTH
+                && sameScoreId / TABLE_LENGTH == id % TABLE_LENGTH
+            ) {
+                return sameScoreId
+            }
+        }
+        return 0
+    }
+
     private fun setState() {
         viewModelScope.launch {
             state.update {
