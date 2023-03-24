@@ -41,7 +41,13 @@ class MainActivity : AppCompatActivity() {
 
         with(binding) {
 
-            scoreRecycler.layoutManager = GridLayoutManager(this@MainActivity, 7)
+            val scoreRecyclerLayoutManager = object : GridLayoutManager(this@MainActivity, 7) {
+                override fun canScrollVertically(): Boolean {
+                    return false
+                }
+            }
+
+            scoreRecycler.layoutManager = scoreRecyclerLayoutManager
             scoreRecycler.adapter = scoreTableAdapter
 
             viewModel.state.onEach { state -> renderState(state) }.launchIn(lifecycleScope)
