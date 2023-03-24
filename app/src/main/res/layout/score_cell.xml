@@ -8,7 +8,6 @@
         android:id="@+id/scoreSell"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_gravity="center"
         android:gravity="center"
         android:inputType="number"
         android:textColor="@color/black" />

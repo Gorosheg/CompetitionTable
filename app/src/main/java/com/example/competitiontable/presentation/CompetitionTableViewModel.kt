@@ -62,12 +62,12 @@ class CompetitionTableViewModel : ViewModel() {
     private fun setState() {
         state.update {
             CompetitionTableState(
-                scoreSellItems = getInitScoreSells()
+                scoreSellItems = buildInitScoreCells()
             )
         }
     }
 
-    private fun getInitScoreSells(): List<TableListItem> {
+    private fun buildInitScoreCells(): List<TableListItem> {
         val list = mutableListOf<TableListItem>()
 
         for (i in 0 until TABLE_LENGTH * TABLE_LENGTH) {
@@ -83,6 +83,6 @@ class CompetitionTableViewModel : ViewModel() {
     }
 
     companion object {
-        private const val TABLE_LENGTH = 7
+        const val TABLE_LENGTH = 7
     }
 }

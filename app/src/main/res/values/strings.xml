@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">CompetitionTable</string>
     <string name="toast_messaage">Недопустимое значение</string>
+    <string name="participant_name">Ученик %1$d</string>
 </resources>
