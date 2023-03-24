@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/background_table_stroke"
         android:orientation="vertical"
-        app:layout_constraintEnd_toStartOf="@+id/scoreRecycler"
+        app:layout_constraintEnd_toStartOf="@+id/tableRecycler"
         app:layout_constraintStart_toEndOf="@+id/participantsLayout"
         app:layout_constraintTop_toTopOf="@id/participantsLayout" />
 
@@ -23,8 +23,8 @@
         android:layout_height="wrap_content"
         android:background="@drawable/background_table_stroke"
         android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="@+id/scoreRecycler"
-        app:layout_constraintStart_toStartOf="@+id/scoreRecycler"
+        app:layout_constraintEnd_toEndOf="@+id/tableRecycler"
+        app:layout_constraintStart_toStartOf="@+id/tableRecycler"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
@@ -33,19 +33,26 @@
         android:layout_height="wrap_content"
         android:background="@drawable/background_table_stroke"
         android:orientation="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintEnd_toStartOf="@id/verticalCounterLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/horizontalCounterLayout" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/scoreRecycler"
+        android:id="@+id/tableRecycler"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@+id/verticalCounterLayout"
         app:layout_constraintTop_toBottomOf="@+id/horizontalCounterLayout"
         tools:itemCount="4"
-        tools:listitem="@layout/score_cell" />
+        tools:listitem="@layout/table_cell" />
 
+    <LinearLayout
+        android:id="@+id/totalScoreLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/background_table_stroke"
+        android:orientation="vertical"
+        app:layout_constraintStart_toEndOf="@+id/horizontalCounterLayout"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

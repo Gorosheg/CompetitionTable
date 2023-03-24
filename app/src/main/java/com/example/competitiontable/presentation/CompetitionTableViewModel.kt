@@ -1,10 +1,7 @@
 package com.example.competitiontable.presentation
 
 import androidx.lifecycle.ViewModel
-import com.example.competitiontable.presentation.model.CompetitionTableState
-import com.example.competitiontable.presentation.model.ScoreMiddleItem
-import com.example.competitiontable.presentation.model.ScoreSellItem
-import com.example.competitiontable.presentation.model.TableListItem
+import com.example.competitiontable.presentation.model.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
@@ -45,7 +42,51 @@ class CompetitionTableViewModel : ViewModel() {
         val sameScoredId = getSameScoredId(id, newTable.size)
         newTable[sameScoredId] = ScoreSellItem(id = sameScoredId, score = newScore)
 
-        state.update { CompetitionTableState(scoreSellItems = newTable, isScoreCorrect = true) }
+        val firstLineIndex = id % TABLE_LENGTH
+        val secondLineIndex = sameScoredId % TABLE_LENGTH
+
+        state.update {
+            CompetitionTableState(
+                scoreSellItems = newTable,
+                isScoreCorrect = true,
+                totalScoreItems = it.totalScoreItems
+                    .toMutableList()
+                    .apply {
+                        this[firstLineIndex + 1] = TotalScoreItem(countLineTotalScore(firstLineIndex, newTable))
+                        this[secondLineIndex + 1] = TotalScoreItem(countLineTotalScore(secondLineIndex, newTable))
+                    }
+            )
+        }
+    }
+
+    private fun countLineTotalScore(lineIndex: Int, table: MutableList<TableListItem>): String {
+        var total = 0
+
+        if (isLineField(lineIndex, table)) {
+            for (item in table) {
+                if (item is ScoreSellItem
+                    && item.id % TABLE_LENGTH == lineIndex
+                )
+                    total += item.score.toInt()
+            }
+        }
+
+        return if (total == 0) ""
+        else total.toString()
+    }
+
+    private fun isLineField(lineIndex: Int, table: MutableList<TableListItem>): Boolean {
+        var filledCellsCounter = 0
+
+        for (item in table) {
+            if (item is ScoreSellItem
+                && item.id % TABLE_LENGTH == lineIndex
+                && item.score.isNotEmpty()
+            ) {
+                filledCellsCounter++
+            }
+        }
+        return filledCellsCounter == TABLE_LENGTH - 1
     }
 
     private fun getSameScoredId(id: Int, tableSize: Int): Int {
@@ -62,12 +103,13 @@ class CompetitionTableViewModel : ViewModel() {
     private fun setState() {
         state.update {
             CompetitionTableState(
-                scoreSellItems = buildInitScoreCells()
+                scoreSellItems = buildTableCells(),
+                totalScoreItems = buildTotalScoreCells()
             )
         }
     }
 
-    private fun buildInitScoreCells(): List<TableListItem> {
+    private fun buildTableCells(): List<TableListItem> {
         val list = mutableListOf<TableListItem>()
 
         for (i in 0 until TABLE_LENGTH * TABLE_LENGTH) {
@@ -76,6 +118,21 @@ class CompetitionTableViewModel : ViewModel() {
             } else {
                 list.add(
                     ScoreSellItem(id = i, score = "")
+                )
+            }
+        }
+        return list
+    }
+
+    private fun buildTotalScoreCells(): List<TotalScoreItem> {
+        val list = mutableListOf<TotalScoreItem>()
+
+        for (i in 0..TABLE_LENGTH) {
+            if (i == 0) {
+                list.add(TotalScoreItem("Сумма очков"))
+            } else {
+                list.add(
+                    TotalScoreItem(score = "")
                 )
             }
         }

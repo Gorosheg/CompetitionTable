@@ -16,8 +16,8 @@ import com.example.competitiontable.databinding.ActivityMainBinding
 import com.example.competitiontable.presentation.CompetitionTableViewModel.Companion.TABLE_LENGTH
 import com.example.competitiontable.presentation.model.CompetitionTableState
 import com.example.competitiontable.presentation.recycler.base.CommonAdapter
-import com.example.competitiontable.presentation.recycler.scoreTableDelegate
-import com.example.competitiontable.presentation.recycler.scoreTableMiddleCellDelegate
+import com.example.competitiontable.presentation.recycler.tableDelegate
+import com.example.competitiontable.presentation.recycler.tableMiddleCellDelegate
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -28,9 +28,9 @@ class MainActivity : AppCompatActivity() {
     private val binding: ActivityMainBinding by viewBinding()
     private val viewModel: CompetitionTableViewModel by viewModel()
 
-    private val scoreTableAdapter = CommonAdapter(
-        scoreTableMiddleCellDelegate(),
-        scoreTableDelegate { id, text ->
+    private val tableAdapter = CommonAdapter(
+        tableMiddleCellDelegate(),
+        tableDelegate { id, text ->
             viewModel.onSellTextChanged(id, text)
         }
     )
@@ -47,14 +47,13 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            scoreRecycler.layoutManager = scoreRecyclerLayoutManager
-            scoreRecycler.adapter = scoreTableAdapter
+            tableRecycler.layoutManager = scoreRecyclerLayoutManager
+            tableRecycler.adapter = tableAdapter
 
             viewModel.state.onEach { state -> renderState(state) }.launchIn(lifecycleScope)
 
             buildCounter(verticalCounterLayout)
             buildCounter(horizontalCounterLayout)
-
             buildParticipants(participantsLayout)
         }
     }
@@ -79,25 +78,37 @@ class MainActivity : AppCompatActivity() {
 
     private fun buildCounter(counterLayout: LinearLayout) {
         for (i in 0 until TABLE_LENGTH) {
-            val number = i + 1
-            val counter = TextView(this)
-            counter.background = AppCompatResources.getDrawable(this, R.drawable.background_table_stroke)
-            counter.layoutParams = LinearLayout.LayoutParams(105, 105)
-            counter.gravity = Gravity.CENTER
-            counter.text = number.toString()
-            counterLayout.addView(counter)
+            buildCountableCell((i + 1).toString(), counterLayout)
         }
     }
 
     private fun renderState(state: CompetitionTableState) = with(binding) {
-        scoreTableAdapter.items = state.scoreSellItems
+        tableAdapter.items = state.scoreSellItems
 
-        if (!scoreRecycler.isComputingLayout) {
-            scoreTableAdapter.notifyDataSetChanged()
+        if (!tableRecycler.isComputingLayout) {
+            tableAdapter.notifyDataSetChanged()
+        }
+
+        totalScoreLayout.removeAllViews()
+        state.totalScoreItems.forEach { totalScoreItem ->
+            buildCountableCell(
+                text = totalScoreItem.score,
+                counterLayout = totalScoreLayout,
+                width = 300
+            )
         }
 
         if (!state.isScoreCorrect) {
             Toast.makeText(this@MainActivity, getString(R.string.toast_messaage), Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun buildCountableCell(text: String, counterLayout: LinearLayout, width: Int = 105) {
+        val counter = TextView(this)
+        counter.background = AppCompatResources.getDrawable(this, R.drawable.background_table_stroke)
+        counter.layoutParams = LinearLayout.LayoutParams(width, 105)
+        counter.gravity = Gravity.CENTER
+        counter.text = text
+        counterLayout.addView(counter)
     }
 }
