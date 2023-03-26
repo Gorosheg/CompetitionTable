@@ -22,6 +22,7 @@ class CompetitionTableViewModel : ViewModel() {
             "" -> Unit
             else -> {
                 val newTable = buildNewTable(id = id, newScore = newScore, isScoreCorrect = false)
+                newTable.leaveCellFocus(id)
                 state.update { CompetitionTableState(scoreSellItems = newTable, isScoreCorrect = false) }
             }
         }
@@ -41,6 +42,8 @@ class CompetitionTableViewModel : ViewModel() {
     private fun setNewSellScore(id: Int, newScore: String, newTable: MutableList<TableListItem>) {
         val sameScoredId = getSameScoredId(id, newTable.size)
         newTable[sameScoredId] = ScoreSellItem(id = sameScoredId, score = newScore)
+
+        newTable.changeCellFocus(id)
 
         val firstLineIndex = id % TABLE_LENGTH
         val secondLineIndex = sameScoredId % TABLE_LENGTH
@@ -66,6 +69,44 @@ class CompetitionTableViewModel : ViewModel() {
                 totalScoreItems = totalScoreItems,
                 winnerItems = winnerItems
             )
+        }
+    }
+
+    private fun getSameScoredId(id: Int, tableSize: Int): Int {
+        for (sameScoreId in 0..tableSize) {
+            if (sameScoreId % TABLE_LENGTH == id / TABLE_LENGTH
+                && sameScoreId / TABLE_LENGTH == id % TABLE_LENGTH
+            ) {
+                return sameScoreId
+            }
+        }
+        return 0
+    }
+
+    private fun MutableList<TableListItem>.changeCellFocus(id: Int) {
+        val nextId = id + 1
+        if (this[id] is ScoreSellItem) {
+            this[id] = (this[id] as ScoreSellItem).copy(isFocused = false)
+        }
+        if (nextId == TABLE_LENGTH * TABLE_LENGTH) return
+
+        val nextItem = this[nextId]
+
+        if (nextItem is ScoreMiddleItem || nextItem is ScoreSellItem && nextItem.score.isNotEmpty()) {
+            changeCellFocus(nextId)
+        } else {
+            this[nextId] = (nextItem as ScoreSellItem).copy(isFocused = true)
+        }
+    }
+
+    private fun MutableList<TableListItem>.leaveCellFocus(id: Int) {
+        this.forEach {
+            if (it is ScoreSellItem) {
+                this[it.id] = (this[it.id] as ScoreSellItem).copy(isFocused = false)
+            }
+        }
+        if (this[id] is ScoreSellItem) {
+            this[id] = (this[id] as ScoreSellItem).copy(isFocused = true)
         }
     }
 

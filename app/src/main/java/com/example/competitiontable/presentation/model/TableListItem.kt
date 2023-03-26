@@ -4,10 +4,11 @@ import com.example.competitiontable.presentation.recycler.base.ListItem
 
 interface TableListItem : ListItem
 
-class ScoreSellItem(
+data class ScoreSellItem(
     val id: Int,
     val score: String,
     val isScoreCorrect: Boolean = true,
+    val isFocused: Boolean = false
 ) : TableListItem
 
 object ScoreMiddleItem : TableListItem
