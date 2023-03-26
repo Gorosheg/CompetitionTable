@@ -1,9 +1,9 @@
-package com.example.competitiontable.presentation.recycler
+package com.example.competitiontable.ui.recycler
 
 import com.example.competitiontable.R
 import com.example.competitiontable.databinding.TableCellBinding
 import com.example.competitiontable.presentation.model.ScoreMiddleItem
-import com.example.competitiontable.presentation.recycler.base.adapterDelegate
+import com.example.competitiontable.ui.recycler.base.adapterDelegate
 
 fun tableMiddleCellDelegate() = adapterDelegate<ScoreMiddleItem, TableCellBinding>(TableCellBinding::inflate) {
 

@@ -1,4 +1,4 @@
-package com.example.competitiontable.presentation.recycler.base
+package com.example.competitiontable.ui.recycler.base
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

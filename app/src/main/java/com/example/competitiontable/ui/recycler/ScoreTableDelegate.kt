@@ -1,13 +1,13 @@
-package com.example.competitiontable.presentation.recycler
+package com.example.competitiontable.ui.recycler
 
 import androidx.core.widget.addTextChangedListener
 import com.example.competitiontable.R
 import com.example.competitiontable.databinding.TableCellBinding
-import com.example.competitiontable.presentation.model.ScoreSellItem
-import com.example.competitiontable.presentation.recycler.base.adapterDelegate
+import com.example.competitiontable.presentation.model.ScoreCellItem
+import com.example.competitiontable.ui.recycler.base.adapterDelegate
 
 fun tableDelegate(onScoreChanged: (id: Int, text: String) -> Unit) =
-    adapterDelegate<ScoreSellItem, TableCellBinding>(TableCellBinding::inflate) {
+    adapterDelegate<ScoreCellItem, TableCellBinding>(TableCellBinding::inflate) {
 
         val listener = tableSell.addTextChangedListener { text ->
             onScoreChanged(item.id, text.toString())
@@ -18,11 +18,11 @@ fun tableDelegate(onScoreChanged: (id: Int, text: String) -> Unit) =
             tableSell.setText(item.score)
             tableSell.addTextChangedListener(listener)
 
-            if (!item.isScoreCorrect) {
-                tableSell.setTextColor(context.getColor(R.color.red))
-            } else {
-                tableSell.setTextColor(context.getColor(R.color.black))
-            }
+            val color =
+                if (!item.isScoreCorrect) R.color.red
+                else R.color.black
+
+            tableSell.setTextColor(context.getColor(color))
 
             if (item.isFocused) {
                 tableSell.requestFocus()

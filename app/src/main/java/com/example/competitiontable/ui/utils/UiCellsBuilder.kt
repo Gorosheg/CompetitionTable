@@ -1,4 +1,4 @@
-package com.example.competitiontable.utils
+package com.example.competitiontable.presentation.utils
 
 import android.view.Gravity
 import android.widget.LinearLayout
@@ -7,6 +7,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.setPadding
 import com.example.competitiontable.R
 import com.example.competitiontable.presentation.CompetitionTableViewModel
+import java.lang.String.*
 
 fun LinearLayout.buildCounter() {
     for (i in 0 until CompetitionTableViewModel.TABLE_LENGTH) {
@@ -32,7 +33,7 @@ fun LinearLayout.buildParticipants() {
         participant.setPadding(12)
         participant.gravity = Gravity.CENTER
 
-        participant.text = java.lang.String.format(
+        participant.text = format(
             context.getString(R.string.participant_name),
             number
         )

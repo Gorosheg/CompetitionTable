@@ -1,4 +1,4 @@
-package com.example.competitiontable.presentation.recycler.base
+package com.example.competitiontable.ui.recycler.base
 
 import com.hannesdorfmann.adapterdelegates4.AdapterDelegate
 import com.hannesdorfmann.adapterdelegates4.AdapterDelegatesManager
