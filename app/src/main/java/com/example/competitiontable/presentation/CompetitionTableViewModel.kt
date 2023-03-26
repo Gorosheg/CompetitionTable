@@ -16,7 +16,7 @@ class CompetitionTableViewModel : ViewModel() {
 
     fun onSellTextChanged(id: Int, newScore: String) {
         when (newScore) {
-            "0", "1", "2", "3", "4", "5" -> {
+            "", "0", "1", "2", "3", "4", "5" -> {
                 val newTable = buildNewTable(
                     scoreSellItems = state.value.scoreSellItems,
                     id = id,
@@ -26,7 +26,6 @@ class CompetitionTableViewModel : ViewModel() {
 
                 setNewSellScore(id, newScore, newTable)
             }
-            "" -> Unit
             else -> {
                 val newTable = buildNewTable(
                     scoreSellItems = state.value.scoreSellItems,
@@ -51,7 +50,9 @@ class CompetitionTableViewModel : ViewModel() {
         val secondLineIndex = sameScoredId % TABLE_LENGTH
 
         newTable[sameScoredId] = ScoreSellItem(id = sameScoredId, score = newScore)
-        newTable.changeCellFocus(id)
+
+        if (newScore.isBlank()) newTable.leaveCellFocus(id)
+        else newTable.changeCellFocus(id)
 
         updateTableResultsInState(firstLineIndex, secondLineIndex, newTable)
     }
