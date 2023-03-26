@@ -2,4 +2,6 @@
     <string name="app_name">CompetitionTable</string>
     <string name="toast_messaage">Недопустимое значение</string>
     <string name="participant_name">Ученик %1$d</string>
+    <string name="total_score">Сумма очков</string>
+    <string name="place">Место</string>
 </resources>

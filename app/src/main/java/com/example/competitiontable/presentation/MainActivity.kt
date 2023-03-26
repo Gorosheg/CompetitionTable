@@ -98,6 +98,15 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+        winnersLayout.removeAllViews()
+        state.winnerItems.forEach { winnerItem ->
+            buildCountableCell(
+                text = winnerItem.place,
+                counterLayout = winnersLayout,
+                width = 300
+            )
+        }
+
         if (!state.isScoreCorrect) {
             Toast.makeText(this@MainActivity, getString(R.string.toast_messaage), Toast.LENGTH_SHORT).show()
         }

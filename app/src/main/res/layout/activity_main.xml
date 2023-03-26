@@ -46,13 +46,40 @@
         tools:itemCount="4"
         tools:listitem="@layout/table_cell" />
 
+    <TextView
+        android:layout_width="115dp"
+        android:layout_height="40dp"
+        android:background="@drawable/background_table_stroke"
+        android:padding="8dp"
+        android:text="@string/total_score"
+        app:layout_constraintStart_toEndOf="@id/horizontalCounterLayout"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="115dp"
+        android:layout_height="40dp"
+        android:background="@drawable/background_table_stroke"
+        android:padding="8dp"
+        android:text="@string/place"
+        app:layout_constraintStart_toEndOf="@id/totalScoreLayout"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
         android:id="@+id/totalScoreLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/background_table_stroke"
         android:orientation="vertical"
-        app:layout_constraintStart_toEndOf="@+id/horizontalCounterLayout"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/tableRecycler"
+        app:layout_constraintTop_toBottomOf="@id/horizontalCounterLayout" />
+
+    <LinearLayout
+        android:id="@+id/winnersLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/background_table_stroke"
+        android:orientation="vertical"
+        app:layout_constraintStart_toEndOf="@id/totalScoreLayout"
+        app:layout_constraintTop_toTopOf="@id/totalScoreLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

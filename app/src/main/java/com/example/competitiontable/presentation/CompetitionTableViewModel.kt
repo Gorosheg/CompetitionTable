@@ -46,28 +46,39 @@ class CompetitionTableViewModel : ViewModel() {
         val secondLineIndex = sameScoredId % TABLE_LENGTH
 
         state.update {
+            val totalScoreItems = it.totalScoreItems
+                .toMutableList()
+                .apply {
+                    this[firstLineIndex] = TotalScoreItem(newTable.countLineTotalScore(firstLineIndex))
+                    this[secondLineIndex] = TotalScoreItem(newTable.countLineTotalScore(secondLineIndex))
+                }
+
+            val winnerItems = totalScoreItems
+                .mapIndexed { initialIndex, totalScoreItem -> initialIndex to totalScoreItem.score }
+                .sortedBy { (_, score) -> score }
+                .mapIndexed { place, (initialIndex, _) -> initialIndex to place }
+                .sortedBy { (initialIndex, _) -> initialIndex }
+                .map { (_, place) -> WinnerItem((place + 1).toString()) }
+
             CompetitionTableState(
                 scoreSellItems = newTable,
                 isScoreCorrect = true,
-                totalScoreItems = it.totalScoreItems
-                    .toMutableList()
-                    .apply {
-                        this[firstLineIndex + 1] = TotalScoreItem(countLineTotalScore(firstLineIndex, newTable))
-                        this[secondLineIndex + 1] = TotalScoreItem(countLineTotalScore(secondLineIndex, newTable))
-                    }
+                totalScoreItems = totalScoreItems,
+                winnerItems = winnerItems
             )
         }
     }
 
-    private fun countLineTotalScore(lineIndex: Int, table: MutableList<TableListItem>): String {
+    private fun MutableList<TableListItem>.countLineTotalScore(lineIndex: Int): String {
         var total = 0
 
-        if (isLineField(lineIndex, table)) {
-            for (item in table) {
+        if (isLineFilled(lineIndex, this)) {
+            for (item in this) {
                 if (item is ScoreSellItem
                     && item.id % TABLE_LENGTH == lineIndex
-                )
+                ) {
                     total += item.score.toInt()
+                }
             }
         }
 
@@ -75,7 +86,7 @@ class CompetitionTableViewModel : ViewModel() {
         else total.toString()
     }
 
-    private fun isLineField(lineIndex: Int, table: MutableList<TableListItem>): Boolean {
+    private fun isLineFilled(lineIndex: Int, table: MutableList<TableListItem>): Boolean {
         var filledCellsCounter = 0
 
         for (item in table) {
@@ -89,22 +100,12 @@ class CompetitionTableViewModel : ViewModel() {
         return filledCellsCounter == TABLE_LENGTH - 1
     }
 
-    private fun getSameScoredId(id: Int, tableSize: Int): Int {
-        for (sameScoreId in 0..tableSize) {
-            if (sameScoreId % TABLE_LENGTH == id / TABLE_LENGTH
-                && sameScoreId / TABLE_LENGTH == id % TABLE_LENGTH
-            ) {
-                return sameScoreId
-            }
-        }
-        return 0
-    }
-
     private fun setState() {
         state.update {
             CompetitionTableState(
                 scoreSellItems = buildTableCells(),
-                totalScoreItems = buildTotalScoreCells()
+                totalScoreItems = buildTotalScoreCells(),
+                winnerItems = buildWinnersCells()
             )
         }
     }
@@ -127,14 +128,21 @@ class CompetitionTableViewModel : ViewModel() {
     private fun buildTotalScoreCells(): List<TotalScoreItem> {
         val list = mutableListOf<TotalScoreItem>()
 
-        for (i in 0..TABLE_LENGTH) {
-            if (i == 0) {
-                list.add(TotalScoreItem("Сумма очков"))
-            } else {
-                list.add(
-                    TotalScoreItem(score = "")
-                )
-            }
+        for (i in 0 until TABLE_LENGTH) {
+            list.add(
+                TotalScoreItem(score = "")
+            )
+        }
+        return list
+    }
+
+    private fun buildWinnersCells(): MutableList<WinnerItem> {
+        val list = mutableListOf<WinnerItem>()
+
+        for (i in 0 until TABLE_LENGTH) {
+            list.add(
+                WinnerItem(place = "")
+            )
         }
         return list
     }
