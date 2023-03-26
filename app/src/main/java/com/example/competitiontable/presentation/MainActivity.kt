@@ -1,27 +1,23 @@
 package com.example.competitiontable.presentation
 
 import android.os.Bundle
-import android.view.Gravity
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.view.setPadding
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.competitiontable.R
 import com.example.competitiontable.databinding.ActivityMainBinding
-import com.example.competitiontable.presentation.CompetitionTableViewModel.Companion.TABLE_LENGTH
 import com.example.competitiontable.presentation.model.CompetitionTableState
 import com.example.competitiontable.presentation.recycler.base.CommonAdapter
 import com.example.competitiontable.presentation.recycler.tableDelegate
 import com.example.competitiontable.presentation.recycler.tableMiddleCellDelegate
+import com.example.competitiontable.utils.buildCountableCell
+import com.example.competitiontable.utils.buildCounter
+import com.example.competitiontable.utils.buildParticipants
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.lang.String.format
 
 class MainActivity : AppCompatActivity() {
 
@@ -52,33 +48,9 @@ class MainActivity : AppCompatActivity() {
 
             viewModel.state.onEach { state -> renderState(state) }.launchIn(lifecycleScope)
 
-            buildCounter(verticalCounterLayout)
-            buildCounter(horizontalCounterLayout)
-            buildParticipants(participantsLayout)
-        }
-    }
-
-    private fun buildParticipants(participantsLayout: LinearLayout) {
-        for (i in 0 until TABLE_LENGTH) {
-            val number = i + 1
-            val participant = TextView(this)
-            participant.background = AppCompatResources.getDrawable(this, R.drawable.background_table_stroke)
-            participant.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 105)
-            participant.setPadding(12)
-            participant.gravity = Gravity.CENTER
-
-            participant.text = format(
-                getString(R.string.participant_name),
-                number
-            )
-
-            participantsLayout.addView(participant)
-        }
-    }
-
-    private fun buildCounter(counterLayout: LinearLayout) {
-        for (i in 0 until TABLE_LENGTH) {
-            buildCountableCell((i + 1).toString(), counterLayout)
+            verticalCounterLayout.buildCounter()
+            horizontalCounterLayout.buildCounter()
+            participantsLayout.buildParticipants()
         }
     }
 
@@ -91,18 +63,16 @@ class MainActivity : AppCompatActivity() {
 
         totalScoreLayout.removeAllViews()
         state.totalScoreItems.forEach { totalScoreItem ->
-            buildCountableCell(
+            totalScoreLayout.buildCountableCell(
                 text = totalScoreItem.score,
-                counterLayout = totalScoreLayout,
                 width = 300
             )
         }
 
         winnersLayout.removeAllViews()
         state.winnerItems.forEach { winnerItem ->
-            buildCountableCell(
+            winnersLayout.buildCountableCell(
                 text = winnerItem.place,
-                counterLayout = winnersLayout,
                 width = 300
             )
         }
@@ -110,14 +80,5 @@ class MainActivity : AppCompatActivity() {
         if (!state.isScoreCorrect) {
             Toast.makeText(this@MainActivity, getString(R.string.toast_messaage), Toast.LENGTH_SHORT).show()
         }
-    }
-
-    private fun buildCountableCell(text: String, counterLayout: LinearLayout, width: Int = 105) {
-        val counter = TextView(this)
-        counter.background = AppCompatResources.getDrawable(this, R.drawable.background_table_stroke)
-        counter.layoutParams = LinearLayout.LayoutParams(width, 105)
-        counter.gravity = Gravity.CENTER
-        counter.text = text
-        counterLayout.addView(counter)
     }
 }
