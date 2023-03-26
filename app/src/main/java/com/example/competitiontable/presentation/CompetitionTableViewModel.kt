@@ -23,7 +23,9 @@ class CompetitionTableViewModel : ViewModel() {
             else -> {
                 val newTable = buildNewTable(id = id, newScore = newScore, isScoreCorrect = false)
                 newTable.leaveCellFocus(id)
-                state.update { CompetitionTableState(scoreSellItems = newTable, isScoreCorrect = false) }
+                state.update {
+                    state.value.copy(scoreSellItems = newTable, isScoreCorrect = false)
+                }
             }
         }
 
@@ -56,12 +58,7 @@ class CompetitionTableViewModel : ViewModel() {
                     this[secondLineIndex] = TotalScoreItem(newTable.countLineTotalScore(secondLineIndex))
                 }
 
-            val winnerItems = totalScoreItems
-                .mapIndexed { initialIndex, totalScoreItem -> initialIndex to totalScoreItem.score }
-                .sortedBy { (_, score) -> score }
-                .mapIndexed { place, (initialIndex, _) -> initialIndex to place }
-                .sortedBy { (initialIndex, _) -> initialIndex }
-                .map { (_, place) -> WinnerItem((place + 1).toString()) }
+            val winnerItems = totalScoreItems.countWinnerPlaces()
 
             CompetitionTableState(
                 scoreSellItems = newTable,
@@ -70,6 +67,18 @@ class CompetitionTableViewModel : ViewModel() {
                 winnerItems = winnerItems
             )
         }
+    }
+
+    private fun MutableList<TotalScoreItem>.countWinnerPlaces(): List<WinnerItem> {
+        for (i in this) {
+            if (i.score == "") return buildEmptyWinnersCells()
+        }
+
+        return mapIndexed { initialIndex, totalScoreItem -> initialIndex to totalScoreItem.score }
+            .sortedBy { (_, score) -> score }
+            .mapIndexed { place, (initialIndex, _) -> initialIndex to place }
+            .sortedBy { (initialIndex, _) -> initialIndex }
+            .map { (_, place) -> WinnerItem((place + 1).toString()) }
     }
 
     private fun getSameScoredId(id: Int, tableSize: Int): Int {
@@ -113,7 +122,7 @@ class CompetitionTableViewModel : ViewModel() {
     private fun MutableList<TableListItem>.countLineTotalScore(lineIndex: Int): String {
         var total = 0
 
-        if (isLineFilled(lineIndex, this)) {
+        if (isLineFilled(lineIndex)) {
             for (item in this) {
                 if (item is ScoreSellItem
                     && item.id % TABLE_LENGTH == lineIndex
@@ -127,10 +136,10 @@ class CompetitionTableViewModel : ViewModel() {
         else total.toString()
     }
 
-    private fun isLineFilled(lineIndex: Int, table: MutableList<TableListItem>): Boolean {
+    private fun MutableList<TableListItem>.isLineFilled(lineIndex: Int): Boolean {
         var filledCellsCounter = 0
 
-        for (item in table) {
+        for (item in this) {
             if (item is ScoreSellItem
                 && item.id % TABLE_LENGTH == lineIndex
                 && item.score.isNotEmpty()
@@ -144,14 +153,14 @@ class CompetitionTableViewModel : ViewModel() {
     private fun setState() {
         state.update {
             CompetitionTableState(
-                scoreSellItems = buildTableCells(),
-                totalScoreItems = buildTotalScoreCells(),
-                winnerItems = buildWinnersCells()
+                scoreSellItems = buildEmptyTableCells(),
+                totalScoreItems = buildEmptyTotalScoreCells(),
+                winnerItems = buildEmptyWinnersCells()
             )
         }
     }
 
-    private fun buildTableCells(): List<TableListItem> {
+    private fun buildEmptyTableCells(): List<TableListItem> {
         val list = mutableListOf<TableListItem>()
 
         for (i in 0 until TABLE_LENGTH * TABLE_LENGTH) {
@@ -166,7 +175,7 @@ class CompetitionTableViewModel : ViewModel() {
         return list
     }
 
-    private fun buildTotalScoreCells(): List<TotalScoreItem> {
+    private fun buildEmptyTotalScoreCells(): List<TotalScoreItem> {
         val list = mutableListOf<TotalScoreItem>()
 
         for (i in 0 until TABLE_LENGTH) {
@@ -177,7 +186,7 @@ class CompetitionTableViewModel : ViewModel() {
         return list
     }
 
-    private fun buildWinnersCells(): MutableList<WinnerItem> {
+    private fun buildEmptyWinnersCells(): MutableList<WinnerItem> {
         val list = mutableListOf<WinnerItem>()
 
         for (i in 0 until TABLE_LENGTH) {
