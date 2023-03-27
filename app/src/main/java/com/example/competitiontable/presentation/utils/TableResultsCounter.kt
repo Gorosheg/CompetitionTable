@@ -14,9 +14,11 @@ fun List<TotalScoreItem>.countWinnerPlaces(): List<WinnerItem> {
         }
     }
 
-    return asSequence()
+    return this
         .mapIndexed { initialIndex, totalScoreItem -> initialIndex to totalScoreItem.score }
         .sortedBy { (_, score) -> score }
+        .reversed()
+        .asSequence()
         .mapIndexed { place, (initialIndex, _) -> initialIndex to place }
         .sortedBy { (initialIndex, _) -> initialIndex }
         .map { (_, place) -> place + 1 }
